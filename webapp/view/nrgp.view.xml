@@ -31,7 +31,7 @@
                     <m:VBox id="_IDGenVBox" >
 
                         <m:HBox id="_IDGenHBox" alignItems="Center">
-                            <m:Label id="_IDGenLabel1" text="Plant" required="true" width="180px"  />
+                            <m:Label id="_IDGenLabel1" text="Plant:" required="true" width="180px"  />
                             <m:Input id="Plant" value="{HEADER>/Plant}" width="200px" showValueHelp="true" valueHelpRequest=".onValueHelpPlant" editable="{visibilityModel>/editability}" />
                         </m:HBox>
 

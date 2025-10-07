@@ -814,6 +814,7 @@ sap.ui.define([
 
                     if (data) {
                         let resp = JSON.parse(data);
+                        
                         let nrgpPost = String(resp.POSTNUMBER).slice(-10);
                         oHeaderModel.setProperty("/PostNRGPNo", nrgpPost);
 
