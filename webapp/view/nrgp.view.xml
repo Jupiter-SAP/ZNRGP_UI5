@@ -76,7 +76,7 @@
                     <m:VBox id="_IDGenVBox1">
                         <m:HBox id="_IDGenHBox8" alignItems="Center">
                             <m:Label id="_IDGenLabel8" text="Partner:" required="false" width="180px" />
-                            <m:ComboBox id="Partner" width="200px" selectedKey="{HEADER>/Partner}" change="onPartnerTypeChange" editable="{visibilityModel>/editability}">
+                            <m:ComboBox id="Partner" width="200px" value="{HEADER>/PartnerType}" selectedKey="{HEADER>/PartnerType}" change="onPartnerTypeChange" editable="{visibilityModel>/editability}">
                                 <m:items>
                                     <core:Item id="_IDGenItem1" key="Vendor" text="Vendor" />
                                     <core:Item id="_IDGenItem2" key="Customer" text="Customer" />
@@ -87,32 +87,32 @@
 
                         <m:HBox id="_IDGenHBox3" alignItems="Center">
                             <m:Label id="_IDGenLabel5" text="Patner Code:" required="false" width="180px" />
-                            <m:Input id="PatnerCode" width="200px" value="{HEADER>/PatnerCode}" showValueHelp="true" valueHelpRequest=".onValueHelpPartner" editable="{visibilityModel>/editability}" />
+                            <m:Input id="PatnerCode" width="200px" value="{HEADER>/PartnerCode}" showValueHelp="true" valueHelpRequest=".onValueHelpPartner" editable="{visibilityModel>/editability}" />
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox10" alignItems="Center">
                             <m:Label id="_IDGenLabel11" text="Patner Name:" required="false" width="180px" />
-                            <m:Input id="PatnerName" width="200px" value="{HEADER>/PatnerName}" editable="{= ${HEADER>/Partner} === 'Other' }"  />
+                            <m:Input id="PatnerName" width="200px" value="{HEADER>/PartnerName}" editable="{= ${HEADER>/PartnerType} === 'Other' }"  />
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox11" alignItems="Center">
                             <m:Label id="_IDGenLabel12" text="Address 1:" required="false" width="180px" />
-                            <m:Input id="Address1" width="200px" value="{HEADER>/Addr1}" editable="{= ${HEADER>/Partner} === 'Other' }" />
+                            <m:Input id="Address1" width="200px" value="{HEADER>/Addr1}" editable="{= ${HEADER>/PartnerType} === 'Other' }" />
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox12" alignItems="Center">
                             <m:Label id="_IDGenLabel13" text="Address 2:" required="false" width="180px" />
-                            <m:Input id="Address2" width="200px" value="{HEADER>/Addr2}" editable="{= ${HEADER>/Partner} === 'Other' }" />
+                            <m:Input id="Address2" width="200px" value="{HEADER>/Addr2}" editable="{= ${HEADER>/PartnerType} === 'Other' }" />
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox13" alignItems="Center">
                             <m:Label id="_IDGenLabel14" text="State Code:" required="false" width="180px" />
-                            <m:Input id="StateCode" width="200px" value="{HEADER>/StateCode}" editable="{= ${HEADER>/Partner} === 'Other' }" />
+                            <m:Input id="StateCode" width="200px" value="{HEADER>/StateCode}" editable="{= ${HEADER>/PartnerType} === 'Other' }" />
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox14" alignItems="Center">
                             <m:Label id="_IDGenLabel15" text="Pin:" required="false" width="180px" />
-                            <m:Input id="Pin" width="200px" value="{HEADER>/Pin}" editable="{= ${HEADER>/Partner} === 'Other' }" />
+                            <m:Input id="Pin" width="200px" value="{HEADER>/Pin}" editable="{= ${HEADER>/PartnerType} === 'Other' }" />
                         </m:HBox>
                     </m:VBox>
 
@@ -158,7 +158,7 @@
                 <t:Column id="colLineNo" width="8rem">
                     <m:Label id="_IDGenLabel3" text="Line Item" />
                     <t:template>
-                        <m:Input id="_IDGenInput11" value="{DETAILS>Lineno}" editable="false"/>
+                        <m:Input id="_IDGenInput11" value="{DETAILS>LineNum}" editable="false"/>
                     </t:template>
                 </t:Column>
 

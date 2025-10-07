@@ -115,7 +115,7 @@ sap.ui.define([
                 var oModel = new ODataModel("/sap/opu/odata/sap/ZSB_GATE/");
                 oModel.read(sPath, {
                     success: function (oData) {
-        
+                    console.log(oData);
                     const oViewModel = new JSONModel(oData);
                     this.getView().setModel(oViewModel, "HEADER");
             }.bind(this),
@@ -124,7 +124,7 @@ sap.ui.define([
             }
         });
 
-               const oModel2 = new ODataModel("/sap/opu/odata/sap/ZSB_GATE/");
+                const oModel2 = new ODataModel("/sap/opu/odata/sap/ZSB_GATE/");
 
                 oModel2.read("/zc_nrgp_item2", {
                     filters: [
@@ -145,7 +145,7 @@ sap.ui.define([
    
             const oHeaderModel = new JSONModel({
                 Plant: "", DocumentNo: "", NRGPDate: "", FromStorageLoc: "", Status: "",
-                Partner: "", PatnerCode: "", PatnerName: "", Addr1: "",
+                PartnerType: "", PartnerCode: "", PartnerName: "", Addr1: "",
                 Addr2: "", StateCode: "", Pin: "", Description1: "", Description2: ""
             });
             this.getView().setModel(oHeaderModel, "HEADER");
@@ -596,9 +596,9 @@ sap.ui.define([
             const oModel = this.getView().getModel("DETAILS");
             const aItems = oModel.getProperty("/Items") || [];
             let nextLine = 10;
-            if (aItems.length > 0) nextLine = aItems[aItems.length - 1].Lineno + 10;
+            if (aItems.length > 0) nextLine = aItems[aItems.length - 1].LineNum + 10;
             aItems.push({
-                Lineno: nextLine, ItemCode: "", ItemName: "", Description: "",
+                LineNum: nextLine, ItemCode: "", ItemName: "", Description: "",
                 Qty: 0, Unit: "", Rate: 0, ItemAmount: 0,
                 TaxCode: "", TaxPercent: 0, TaxAmount: 0, NetAmount: 0
             });
@@ -638,9 +638,9 @@ sap.ui.define([
                     document_no: headerData.DocumentNo || "",
                     plant: headerData.Plant || "",
                     partner_type: oView.byId("Partner").getSelectedKey() || "",
-                    partner_code: headerData.PatnerCode || "",
+                    partner_code: headerData.PartnerCode || "",
                     document_date: this.formatDateToIST(newDate),
-                    partner_name: headerData.PatnerName || "",
+                    partner_name: headerData.PartnerName || "",
                     from_storage_loc: headerData.FromStorageLoc || "",
                     addr1: headerData.Addr1 || "",
                     addr2: headerData.Add2 || "",
@@ -652,7 +652,7 @@ sap.ui.define([
                 },
                 items: items.map(i => ({
 
-                    line_no: i.Lineno || "",
+                    line_no: i.LineNum || "",
                     product: i.ItemCode || "",
                     productname: i.ItemName || "",
                     item_text: i.Description || "",
@@ -721,9 +721,9 @@ sap.ui.define([
                     document_no: headerData.DocumentNo || "",
                     plant: headerData.Plant || "",
                     partner_type: oView.byId("Partner").getSelectedKey() || "",
-                    partner_code: headerData.PatnerCode || "",
+                    partner_code: headerData.PartnerCode || "",
                     document_date: this.formatDateToIST(newDate),
-                    partner_name: headerData.PatnerName || "",
+                    partner_name: headerData.PartnerName || "",
                     from_storage_loc: headerData.FromStorageLoc || "",
                     addr1: headerData.Addr1 || "",
                     addr2: headerData.Addr2 || "",
@@ -735,7 +735,7 @@ sap.ui.define([
                 },
                 items: items.map(i => ({
 
-                    line_no: i.Lineno || "",
+                    line_no: i.LineNum || "",
                     product: i.ItemCode || "",
                     productname: i.ItemName || "",
                     item_text: i.Description || "",
