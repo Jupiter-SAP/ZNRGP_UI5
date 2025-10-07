@@ -1,0 +1,148 @@
+{
+  "_version": "1.73.1",
+  "sap.app": {
+    "id": "znrgp",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.18.7",
+      "toolsId": "f1204de1-cf9c-4b1e-9fb8-abeddf35687e"
+    },
+    "dataSources": {
+      "ZSB_GATE_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZSB_GATE_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/mainService/ZSB_GATE_VAN.xml"
+        }
+      },
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZSB_GATE/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZSB_GATE_VAN"
+          ],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "ZNRGP-Manage": {
+          "semanticObject": "ZNRGP",
+          "action": "Manage",
+          "title": "{{ZNRGP-Manage.flpTitle}}",
+          "subTitle": "{{ZNRGP-Manage.flpSubtitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.136.8",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "znrgp.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "znrgp.view",
+        "async": true,
+        "viewPath": "znrgp.view"
+      },
+      "routes": [
+        {
+          "name": "Routenrgp",
+          "pattern": "nrgp/{docNo}",
+          "target": [
+            "Targetnrgp"
+          ]
+        },
+        {
+          "name": "Routehome",
+          "pattern": "",
+          "target": [
+            "Targethome"
+          ]
+        }
+      ],
+      "targets": {
+        "Targetnrgp": {
+          "id": "nrgp",
+          "name": "nrgp"
+        },
+         "Targethome": {
+          "id": "header",
+          "name": "header"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "znrgp.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  }
+}

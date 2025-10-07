@@ -1,0 +1,16 @@
+/* Enter your custom styles here */
+@media (min-width: 80rem) {
+    .sapUiMedia-Std-Desktop .sapUShellApplicationContainer.sapUShellApplicationContainerLimitedWidth {
+        width: 100%!important;
+    }
+}
+ 
+ 
+.FontColorChange{
+    display: flex;
+}
+ 
+._IDGenVBox,._IDGenSimpleForm,.OrderDetailsTable2{
+    width: 95%!important;
+    margin: 10px auto;
+}

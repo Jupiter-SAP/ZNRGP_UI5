@@ -1,0 +1,92 @@
+<mvc:View
+    controllerName="znrgp.controller.header"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+    xmlns:table="sap.ui.table"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    height="100%"
+>
+    <VBox
+        id="mainVBox"
+        fitContainer="true"
+        height="100%"
+    >
+        <smartFilterBar:SmartFilterBar
+            id="headerFilter"
+            entitySet="ZI_GATE_NRGP_HDR"
+        
+            useDateRangeType="true"
+        >
+            <smartFilterBar:controlConfiguration>
+                <!-- <smartFilterBar:ControlConfiguration
+                    id="_IDGenControlConfiguration2"
+                    key="Supplier"
+                    visibleInAdvancedArea="true"
+                /> -->
+                <!-- <smartFilterBar:ControlConfiguration
+                    id="_IDGenControlConfiguration6"
+                    key="Paymentstat"
+                    visibleInAdvancedArea="true"
+                /> -->
+                <!-- <smartFilterBar:ControlConfiguration
+                    id="_IDGenControlConfiguration5"
+                    key="Glaccount"
+                    visibleInAdvancedArea="true"
+                /> -->
+                <!-- <smartFilterBar:ControlConfiguration
+                    id="_IDGenControlConfiguration7"
+                    key="Postingdate"
+                    visibleInAdvancedArea="true"
+                /> -->
+            </smartFilterBar:controlConfiguration>
+        </smartFilterBar:SmartFilterBar>
+        <!-- Smart Table (ResponsiveTable) -->
+        <smartTable:SmartTable
+            id="headerTable"
+            entitySet="ZI_GATE_NRGP_HDR"
+            smartFilterId="sfbBankPayable"
+            header="Gate Pass Header"
+            useVariantManagement="false"
+            useTablePersonalisation="true"
+            persistencyKey="SmartTable_NrgpGatePass"
+            enableAutoColumnWidth="true"
+            enableAutoBinding="true"
+            width="100%"
+            enableExport="true"
+            editTogglable="false"
+            beforeExport=".onBeforeExport"
+            height="100%"
+            showRowCount="true"
+            ignoredFields="__metadata"
+        >
+           
+            <smartTable:customToolbar>
+                <OverflowToolbar id="_IDGenOverflowToolbar">
+                    <ToolbarSpacer id="_IDGenToolbarSpacer2" />
+                  
+                    <Button
+                        id="_IDGenButton"
+                        text="Create"
+                        press=".onNavigate"
+                    />
+                </OverflowToolbar>
+            </smartTable:customToolbar>
+    	<table:Table
+                id="RespTable"
+                selectionMode="Single"
+                rowSelectionChange=""
+                rowActionCount="1"
+            ><table:rowActionTemplate>
+        <table:RowAction id="_IDGenRowAction">
+         <table:RowActionItem id="_IDGenRowActionItem" type="Navigation" press="onEditPage">
+         </table:RowActionItem></table:RowAction>
+            </table:rowActionTemplate>
+            </table:Table>
+        </smartTable:SmartTable>
+    </VBox>
+</mvc:View>
