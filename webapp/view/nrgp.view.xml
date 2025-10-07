@@ -31,12 +31,12 @@
                     <m:VBox id="_IDGenVBox" >
 
                         <m:HBox id="_IDGenHBox" alignItems="Center">
-                            <m:Label id="_IDGenLabel1" text="Plant" required="false" width="180px" />
+                            <m:Label id="_IDGenLabel1" text="Plant" required="true" width="180px"  />
                             <m:Input id="Plant" value="{HEADER>/Plant}" width="200px" showValueHelp="true" valueHelpRequest=".onValueHelpPlant" editable="{visibilityModel>/editability}" />
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox2" alignItems="Center" >
-                            <m:Label id="_IDGenLabel2" text="NRGP No.:" required="false" width="180px" />
+                            <m:Label id="_IDGenLabel2" text="NRGP No.:" required="true" width="180px" />
                             <m:Input id="NRGPNo" value="{HEADER>/DocumentNo}" width="200px" editable = "false"/>
                         </m:HBox>
 
@@ -51,7 +51,7 @@
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox5" alignItems="Center">
-                            <m:Label id="_IDGenLabel6" text="Storage Location:" required="false" width="180px" />
+                            <m:Label id="_IDGenLabel6" text="Storage Location:" required="true" width="180px" />
                             <m:Input id="Loaction" value="{HEADER>/FromStorageLoc}" width="200px" showValueHelp="true" valueHelpRequest=".onValueHelpLoc" editable="{visibilityModel>/editability}"  />
                         </m:HBox>
 
@@ -148,8 +148,8 @@
                 <m:OverflowToolbar id="toolbarOrderDetails">
                     <m:Title id="titleOrderDetails" text="Items" />
                     <m:ToolbarSpacer id="_IDGenToolbarSpacer" />
-                    <m:Button id="btnAddLine" icon="sap-icon://add" press="addLine" />
-                    <m:Button id="btnDeleteLine" icon="sap-icon://delete" press="deleteLine" />
+                    <m:Button id="btnAddLine" icon="sap-icon://add" press="addLine" enabled="{visibilityModel>/editability}" />
+                    <m:Button id="btnDeleteLine" icon="sap-icon://delete" press="deleteLine" enabled="{visibilityModel>/editability}" />
                 </m:OverflowToolbar>
             </t:extension>
 
@@ -164,7 +164,7 @@
 
                 <!-- Item Code -->
                 <t:Column id="colItemCode" width="15rem">
-                    <m:Label id="_IDGenLabel16" text="Material Code" />
+                    <m:Label id="_IDGenLabel16" text="Material Code" required="true" />
                     <t:template> 
                         <m:Input id="_IDGenInput" value="{DETAILS>ItemCode}" liveChange=".onValueChange" showValueHelp="true" valueHelpRequest=".onValueHelpitem" editable="{visibilityModel>/editability}" />
                     </t:template>
@@ -188,7 +188,7 @@
 
                 <!-- Quantity -->
                 <t:Column id="colQty" width="8rem">
-                    <m:Label id="_IDGenLabel19" text="Quantity" />
+                    <m:Label id="_IDGenLabel19" text="Quantity" required="true"/>
                     <t:template>
                         <m:Input id="_IDGenInput3" value="{DETAILS>Qty}" type="Number" liveChange=".onValueChange"/>
                     </t:template>
@@ -204,7 +204,7 @@
 
                              <!-- Batch -->
                 <t:Column id="colBatch" width="12rem">
-                    <m:Label id="_IDGenLabel271" text="Batch" />
+                    <m:Label id="_IDGenLabel271" text="Batch" required="true"/>
                     <t:template>
                         <m:Input id="_IDGenInput111" value="{DETAILS>Batch}" liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
                     </t:template>
@@ -212,15 +212,15 @@
 
                        <!-- Cost Center -->
                 <t:Column id="colCostCenter" width="12rem">
-                    <m:Label id="_IDGenLabel261" text="Cost Center" />
+                    <m:Label id="_IDGenLabel261" text="Cost Center" required="true"/>
                     <t:template>
-                        <m:Input id="_IDGenInput101" value="{DETAILS>CostCenter}"  liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
+                        <m:Input id="_IDGenInput101" value="{DETAILS>CostCenter}"  liveChange=".onValueChange" editable="{visibilityModel>/editability}" />
                     </t:template>
                 </t:Column>
 
                 <!-- Rate -->
                 <t:Column id="colRate" width="10rem">
-                    <m:Label id="_IDGenLabel21" text="Rate" />
+                    <m:Label id="_IDGenLabel21" text="Rate" required="true"/>
                     <t:template>
                         <m:Input id="_IDGenInput5" value="{DETAILS>Rate}" liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
                     </t:template>
@@ -228,7 +228,7 @@
 
                 <!-- Rate -->
                 <t:Column id="colnetweight" width="10rem">
-                    <m:Label id="_IDGenLabel27" text="Net Weight" />
+                    <m:Label id="_IDGenLabel27" text="Net Weight" required="true"/>
                     <t:template>
                         <m:Input id="_IDGenInput12" value="{DETAILS>NetWeight}" liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
                     </t:template>
@@ -244,7 +244,7 @@
 
                 <!-- Tax Code -->
                 <t:Column id="colTaxCode" width="8rem">
-                    <m:Label id="_IDGenLabel23" text="Tax Code" />
+                    <m:Label id="_IDGenLabel23" text="Tax Code" required="true"/>
                     <t:template>
                         <m:Input id="_IDGenInput7" value="{DETAILS>TaxCode}" liveChange=".onValueChange" showValueHelp="true" valueHelpRequest=".onValueHelptax" editable="{visibilityModel>/editability}" />
                     </t:template>

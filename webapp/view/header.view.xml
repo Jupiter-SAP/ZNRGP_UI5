@@ -15,11 +15,11 @@
         id="mainVBox"
         fitContainer="true"
         height="100%"
+         width="100%"
     >
         <smartFilterBar:SmartFilterBar
             id="headerFilter"
             entitySet="ZI_GATE_NRGP_HDR"
-        
             useDateRangeType="true"
         >
             <smartFilterBar:controlConfiguration>

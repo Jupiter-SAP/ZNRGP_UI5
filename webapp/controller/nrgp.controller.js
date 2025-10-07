@@ -102,9 +102,7 @@ sap.ui.define([
             editability : false
             });
             this.getView().setModel(this.btnModel,"visibilityModel");
-            console.log( this.getView().getModel("visibilityModel"))
-            console.log(document)
-
+        
              if(document.length === 10){
                 
                this.getView().getModel("visibilityModel").setProperty("/visibility", false);
@@ -115,7 +113,7 @@ sap.ui.define([
                 var oModel = new ODataModel("/sap/opu/odata/sap/ZSB_GATE/");
                 oModel.read(sPath, {
                     success: function (oData) {
-                    console.log(oData);
+
                     const oViewModel = new JSONModel(oData);
                     this.getView().setModel(oViewModel, "HEADER");
             }.bind(this),
@@ -133,7 +131,7 @@ sap.ui.define([
                     success: function (oData2) {
                         const DetailsModel = new sap.ui.model.json.JSONModel({ Items: oData2.results });
                         this.getView().setModel(DetailsModel, "DETAILS");
-                        console.log("Records loaded:", oData2.results);
+    
                     }.bind(this),
                     error: function (oError2) {
                         console.error("Read failed:", oError2);
@@ -166,7 +164,6 @@ sap.ui.define([
             this.getView().getModel("HEADER").refresh(true);
             this.getView().getModel("DETAILS").refresh(true);
         }
-            console.log(this.getView().getModel("visibilityModel").getProperty("/visibility"))
             
 },
 
@@ -408,7 +405,7 @@ sap.ui.define([
                         const aTokens = oEvt.getParameter("tokens");
                         if (aTokens && aTokens.length) {
                             const oSel = aTokens[0].getCustomData()[0].getValue();
-                            console.log(oSel)
+                          
                             const oCtx = that._oCurrentInput.getBindingContext("DETAILS");
                             if (oCtx) {
                                 const sPath = oCtx.getPath();
@@ -629,7 +626,7 @@ sap.ui.define([
                 return;
             }
 
-            if (!headerData.Status) headerData.Status = "Inprocess";
+            if (!headerData.Status) headerData.Status = "In process";
 
             const newDate = new Date();
 
@@ -646,7 +643,7 @@ sap.ui.define([
                     addr2: headerData.Add2 || "",
                     state_code: headerData.StateCode || "",
                     pin: headerData.Pin || "",
-                    status: headerData.Status || "Inprocess",
+                    status: headerData.Status || "In process",
                     description1: headerData.Description1 || "",
                     description2: headerData.Description2 || ""
                 },
@@ -669,11 +666,35 @@ sap.ui.define([
                     cost_center: i.CostCenter || ""
                 }))
             };
-            debugger
+
+            if (
+                !headerData.DocumentNo ||
+                !headerData.Plant ||
+                !headerData.FromStorageLoc
+            ) {
+                sap.m.MessageBox.error("Please fill all mandatory header fields: Document No, Plant, and Storage Location.");
+                return;
+            }
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (
+                    !item.Qty ||
+                    !item.Rate ||
+                    !item.Batch ||
+                    !item.CostCenter ||
+                    !item.TaxCode ||
+                    !item.NetWeight
+                ) {
+                    sap.m.MessageBox.error(`Please fill all mandatory fields in item line ${i + 1}: Quantity, Rate, Batch, Cost Center, Tax Code, and Net Weight.`);
+                    return;
+                }
+            }
+
             const oBusy = new BusyDialog({ text: "Creating NRGP..." });
             oBusy.open();
 
-            const that = this; // keep reference to controller
+            const that = this; 
 
             $.ajax({
                 url: `/sap/bc/http/sap/ZHTTP_GATENRGP?shipped=false`,
@@ -684,7 +705,7 @@ sap.ui.define([
                     oBusy.close();
 
                     if (response) {
-                        oHeaderModel.setProperty("/Status", "Inprocess");
+                        oHeaderModel.setProperty("/Status", "In process");
 
                         MessageToast.show("Document Created for " + response);
                     } else {
@@ -701,13 +722,38 @@ sap.ui.define([
             });
         },
         onClickShip: function () {
-            const oView = this.getView();
-           
+           const oView = this.getView();
+           const items = [];
+           const oTable = this.byId("TableDetails");
+           const aSelectedIndices = oTable.getSelectedIndices();
+
+        for (let i = 0; i < aSelectedIndices.length; i++) {
+            var oContext = oTable.getContextByIndex(aSelectedIndices[i]);
+            if (!oContext) continue;
+
+            var row = oContext.getObject();
+
+            items.push({
+                LineNum: row.LineNum || "",
+                ItemCode: row.ItemCode || "",
+                ItemName: row.ItemName || "",
+                Description: row.Description || "",
+                Qty: row.Qty ? row.Qty.toString() : "0",
+                Unit: row.Unit || "",
+                Rate: row.Rate ? row.Rate.toString() : "0",
+                ItemAmount: row.ItemAmount ? row.ItemAmount.toString() : "0",
+                TaxCode: row.TaxCode || "",
+                TaxPercent: row.TaxPercent ? row.TaxPercent.toString() : "0",
+                TaxAmount: row.TaxAmount ? row.TaxAmount.toString() : "0",
+                NetAmount: row.NetAmount ? row.NetAmount.toString() : "0",
+                NetWeight: row.NetWeight ? row.NetWeight.toString() : "0",
+                Batch: row.Batch || "",
+                CostCenter: row.CostCenter || ""
+            });
+        }
             const oHeaderModel = oView.getModel("HEADER");
-            const oDetailsModel = oView.getModel("DETAILS");
 
             const headerData = oHeaderModel.getData();
-            const items = oDetailsModel.getProperty("/Items") || [];
 
             if (items.length === 0) {
                 MessageToast.show("Please add at least one item.");
@@ -729,7 +775,7 @@ sap.ui.define([
                     addr2: headerData.Addr2 || "",
                     state_code: headerData.StateCode || "",
                     pin: headerData.Pin || "",
-                    status: headerData.Status || "Inprocess",
+                    status: headerData.Status || "In process",
                     description1: headerData.Description1 || "",
                     description2: headerData.Description2 || ""
                 },
