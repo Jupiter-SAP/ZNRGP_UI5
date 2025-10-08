@@ -26,7 +26,7 @@ sap.ui.define([
             const router1 = this.getOwnerComponent().getRouter();
             if(router1){
             router1.navTo("Routenrgp",{
-            docNo : "0000000" + sDocumentNo 
+            docNo : sDocumentNo 
         })
             }
         },

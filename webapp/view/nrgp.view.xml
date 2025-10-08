@@ -75,7 +75,7 @@
                     <!-- Right Section -->
                     <m:VBox id="_IDGenVBox1">
                         <m:HBox id="_IDGenHBox8" alignItems="Center">
-                            <m:Label id="_IDGenLabel8" text="Partner:" required="false" width="180px" />
+                            <m:Label id="_IDGenLabel8" text="Partner:" required="true" width="180px" />
                             <m:ComboBox id="Partner" width="200px" value="{HEADER>/PartnerType}" selectedKey="{HEADER>/PartnerType}" change="onPartnerTypeChange" editable="{visibilityModel>/editability}">
                                 <m:items>
                                     <core:Item id="_IDGenItem1" key="Vendor" text="Vendor" />
@@ -86,7 +86,7 @@
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox3" alignItems="Center">
-                            <m:Label id="_IDGenLabel5" text="Patner Code:" required="false" width="180px" />
+                            <m:Label id="_IDGenLabel5" text="Partner Code:" required="true" width="180px" />
                             <m:Input id="PatnerCode" width="200px" value="{HEADER>/PartnerCode}" showValueHelp="true" valueHelpRequest=".onValueHelpPartner" editable="{visibilityModel>/editability}" />
                         </m:HBox>
 
@@ -171,18 +171,18 @@
                 </t:Column>
 
                 <!-- Item Name -->
-                <!-- <t:Column id="colItemName" width="12rem">
+                <t:Column id="colItemName" width="12rem">
                     <m:Label id="_IDGenLabel17" text="Material Name" />
                     <t:template>
                         <m:Input id="_IDGenInput1" value="{DETAILS>ItemName}" liveChange=".onValueChange" editable="false"/>
                     </t:template>
-                </t:Column> -->
+                </t:Column>
 
                 <!-- Description -->
                 <t:Column id="colDescription" width="14rem">
                     <m:Label id="_IDGenLabel18" text="Description" />
                     <t:template>
-                        <m:Input id="_IDGenInput2" value="{DETAILS>Description}" liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
+                        <m:Input id="_IDGenInput2" value="{DETAILS>Description}"  editable="{visibilityModel>/editability}"/>
                     </t:template>
                 </t:Column>
 
@@ -193,6 +193,14 @@
                         <m:Input id="_IDGenInput3" value="{DETAILS>Qty}" type="Number" liveChange=".onValueChange"/>
                     </t:template>
                 </t:Column>
+
+                <!-- Shipped Quantity -->
+                <!-- <t:Column id="colShippedQty" width="8rem">
+                    <m:Label id="_IDGenLabel29" text="Shipped Quantity" required="false"/>
+                    <t:template>
+                        <m:Input id="_IDGenInput30" value="{DETAILS>ShippedQuantity}" type="Number" liveChange=".onValueChange"/>
+                    </t:template>
+                </t:Column> -->
 
                 <!-- Unit -->
                 <t:Column id="colUnit" width="8rem">
@@ -206,7 +214,7 @@
                 <t:Column id="colBatch" width="12rem">
                     <m:Label id="_IDGenLabel271" text="Batch" required="true"/>
                     <t:template>
-                        <m:Input id="_IDGenInput111" value="{DETAILS>Batch}" liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
+                        <m:Input id="_IDGenInput111" value="{DETAILS>Batch}" showValueHelp="true" valueHelpRequest=".onvaluehelpbatch" editable="{visibilityModel>/editability}"/>
                     </t:template>
                 </t:Column>
 
@@ -214,7 +222,7 @@
                 <t:Column id="colCostCenter" width="12rem">
                     <m:Label id="_IDGenLabel261" text="Cost Center" required="true"/>
                     <t:template>
-                        <m:Input id="_IDGenInput101" value="{DETAILS>CostCenter}"  liveChange=".onValueChange" editable="{visibilityModel>/editability}" />
+                        <m:Input id="_IDGenInput101"  value="{DETAILS>CostCenter}" editable="{visibilityModel>/editability}" />
                     </t:template>
                 </t:Column>
 
@@ -222,11 +230,11 @@
                 <t:Column id="colRate" width="10rem">
                     <m:Label id="_IDGenLabel21" text="Rate" required="true"/>
                     <t:template>
-                        <m:Input id="_IDGenInput5" value="{DETAILS>Rate}" liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
+                        <m:Input id="_IDGenInput5" value="{DETAILS>Rate}"  liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
                     </t:template>
                 </t:Column>
 
-                <!-- Rate -->
+                <!-- Net Weight -->
                 <t:Column id="colnetweight" width="10rem">
                     <m:Label id="_IDGenLabel27" text="Net Weight" required="true"/>
                     <t:template>

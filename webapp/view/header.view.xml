@@ -18,9 +18,9 @@
          width="100%"
     >
         <smartFilterBar:SmartFilterBar
-            id="headerFilter"
             entitySet="ZI_GATE_NRGP_HDR"
-            useDateRangeType="true"
+            id="smartFilterBar" persistencyKey="SmartFilter_Explored" 
+            enableBasicSearch="false" 
         >
             <smartFilterBar:controlConfiguration>
                 <!-- <smartFilterBar:ControlConfiguration

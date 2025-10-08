@@ -129,10 +129,19 @@ sap.ui.define([
                         new sap.ui.model.Filter("DocumentNo", sap.ui.model.FilterOperator.EQ, document)
                     ],
                     success: function (oData2) {
-                        const DetailsModel = new sap.ui.model.json.JSONModel({ Items: oData2.results });
-                        this.getView().setModel(DetailsModel, "DETAILS");
-    
-                    }.bind(this),
+                    let oDataArray = oData2.results;
+                    console.log(oDataArray)
+                    oDataArray.forEach(item => {
+                        item.Qty = item.Qty - item.ShippedQuantity;
+                    });
+                    
+                  
+
+                    console.log(oDataArray)
+                    const DetailsModel = new JSONModel({ Items: oDataArray });
+                    this.getView().setModel(DetailsModel, "DETAILS");
+
+                    }.bind(this), 
                     error: function (oError2) {
                         console.error("Read failed:", oError2);
                     }
@@ -540,12 +549,7 @@ sap.ui.define([
                             label: "Item Code",
                             control: new Input({ name: "ItemCode" })
                         }),
-                        new FilterGroupItem({
-                            groupName: "grp",
-                            name: "ItemName",
-                            label: "Item Name",
-                            control: new Input({ name: "ItemName" })
-                        })
+                
                     ],
                     search: function (oEvt) {
                         const aSelectionSet = oEvt.getParameter("selectionSet");
@@ -692,7 +696,7 @@ sap.ui.define([
             aItems.push({
                 LineNum: nextLine, ItemCode: "", ItemName: "", Description: "",
                 Qty: "", Unit: "", Rate: "", ItemAmount: "",
-                TaxCode: "", TaxPercent: "", TaxAmount: "", NetAmount: ""
+                TaxCode: "", TaxPercent: "", TaxAmount: "", NetAmount: "",ShippedQuantity: 0
             });
             oModel.setProperty("/Items", aItems);
         },
@@ -765,9 +769,11 @@ sap.ui.define([
             if (
                 !headerData.DocumentNo ||
                 !headerData.Plant ||
-                !headerData.FromStorageLoc
+                !headerData.FromStorageLoc ||
+                !headerData.PartnerType ||
+                !headerData.PartnerCode
             ) {
-                sap.m.MessageBox.error("Please fill all mandatory header fields: Document No, Plant, and Storage Location.");
+                sap.m.MessageBox.error("Please fill all mandatory header fields");
                 return;
             }
 
@@ -818,37 +824,39 @@ sap.ui.define([
         },
         onClickShip: function () {
            const oView = this.getView();
-           const items = [];
-           const oTable = this.byId("TableDetails");
-           const aSelectedIndices = oTable.getSelectedIndices();
+        //    const items = [];
+        //    const oTable = this.byId("TableDetails");
+        //    const aSelectedIndices = oTable.getSelectedIndices();
 
-        for (let i = 0; i < aSelectedIndices.length; i++) {
-            var oContext = oTable.getContextByIndex(aSelectedIndices[i]);
-            if (!oContext) continue;
+        // for (let i = 0; i < aSelectedIndices.length; i++) {
+        //     var oContext = oTable.getContextByIndex(aSelectedIndices[i]);
+        //     if (!oContext) continue;
 
-            var row = oContext.getObject();
+        //     var row = oContext.getObject();
 
-            items.push({
-                LineNum: row.LineNum || "",
-                ItemCode: row.ItemCode || "",
-                ItemName: row.ItemName || "",
-                Description: row.Description || "",
-                Qty: row.Qty ? row.Qty.toString() : "0",
-                Unit: row.Unit || "",
-                Rate: row.Rate ? row.Rate.toString() : "0",
-                ItemAmount: row.ItemAmount ? row.ItemAmount.toString() : "0",
-                TaxCode: row.TaxCode || "",
-                TaxPercent: row.TaxPercent ? row.TaxPercent.toString() : "0",
-                TaxAmount: row.TaxAmount ? row.TaxAmount.toString() : "0",
-                NetAmount: row.NetAmount ? row.NetAmount.toString() : "0",
-                NetWeight: row.NetWeight ? row.NetWeight.toString() : "0",
-                Batch: row.Batch || "",
-                CostCenter: row.CostCenter || ""
-            });
-        }
+        //     items.push({
+        //         LineNum: row.LineNum || "",
+        //         ItemCode: row.ItemCode || "",
+        //         ItemName: row.ItemName || "",
+        //         Description: row.Description || "",
+        //         Qty: row.Qty ? row.Qty.toString() : "0",
+        //         Unit: row.Unit || "",
+        //         Rate: row.Rate ? row.Rate.toString() : "0",
+        //         ItemAmount: row.ItemAmount ? row.ItemAmount.toString() : "0",
+        //         TaxCode: row.TaxCode || "",
+        //         TaxPercent: row.TaxPercent ? row.TaxPercent.toString() : "0",
+        //         TaxAmount: row.TaxAmount ? row.TaxAmount.toString() : "0",
+        //         NetAmount: row.NetAmount ? row.NetAmount.toString() : "0",
+        //         NetWeight: row.NetWeight ? row.NetWeight.toString() : "0",
+        //         Batch: row.Batch || "",
+        //         CostCenter: row.CostCenter || ""
+        //     });
+        // }
+
             const oHeaderModel = oView.getModel("HEADER");
-
+            const oDetailsModel = oView.getModel("DETAILS");
             const headerData = oHeaderModel.getData();
+            const items = oDetailsModel.getProperty("/Items") || [];
 
             if (items.length === 0) {
                 MessageToast.show("Please add at least one item.");
@@ -893,7 +901,6 @@ sap.ui.define([
                 }))
             };
 
-            
             headerData.Status = "Shipped";
 
             const oBusy = new BusyDialog({ text: "Shipping Goods" });
@@ -906,10 +913,10 @@ sap.ui.define([
                 data: JSON.stringify(oPayload),
                 success: function (data) {
                     oBusy.close();
-                   console.log(data)
+                 
                     if (data) {
                         let resp = JSON.parse(data);
-                        console.log(resp)
+                        
                         let nrgpPost = String(resp.POSTNUMBER).slice(-10);
                         oHeaderModel.setProperty("/PostNRGPNo", nrgpPost);
 
@@ -924,6 +931,100 @@ sap.ui.define([
 
                 }
             });
+
+        },
+
+     onvaluehelpbatch: async function (oEvt){
+
+            this._oCurrentInput = oEvt.getSource(); 
+            const oView = this.getView();
+            const oBusy = new BusyDialog({ text: "Loading items..." });
+            const path = this._oCurrentInput.getBindingContext("DETAILS").getPath()
+            const item_code = this.getView().getModel("DETAILS").getProperty(path).ItemCode
+            oBusy.open();
+
+            if (!this._batchVH) {
+                const that = this;
+                const sSelectedPlant = oView.getModel("HEADER").getProperty("/Plant");
+                this._batchVH = new ValueHelpDialog("Ibatch", {
+                    supportMultiselect: false,
+                    key: "Batch",
+                    descriptionKey: "Batch",
+                    stretch: Device.system.phone,
+                    ok: function (oEvt) {
+                        const aTokens = oEvt.getParameter("tokens");
+                        if (aTokens && aTokens.length) {
+                            const oSel = aTokens[0].getCustomData()[0].getValue();
+                            const oCtx = that._oCurrentInput.getBindingContext("DETAILS");
+                            debugger
+                            if (oCtx) {
+                                const sPath = oCtx.getPath();
+                                // console.log(oSel,sPath)
+                                const oDetailsModel = that.getView().getModel("DETAILS");
+                                oDetailsModel.setProperty(sPath + "/Batch", oSel.Batch);
+                                const oRow = oDetailsModel.getProperty(sPath);
+                                oDetailsModel.setProperty(sPath,oRow);
+                            }
+                        }
+                        that._batchVH.close();
+                    },
+                    cancel: function () { that._batchVH.close(); }
+                });
+                oView.addDependent(this._batchVH);
+
+                const oTable = await this._batchVH.getTableAsync();
+                const oColModel = new JSONModel({
+                    cols: [
+                        { label: "Batch", template: "Batch" },
+                        { label: "Material", template: "Material" }
+                    ]
+                });
+                oTable.setModel(oColModel, "columns");
+                oTable.setModel(this.getView().getModel("nrgp"));
+
+                const oFilterBar = new FilterBar({
+                    advancedMode: true,
+                    filterBarExpanded: true,
+                    filterGroupItems: [
+                        new FilterGroupItem({
+                            groupName: "grp",
+                            name: "Batch",
+                            label: "Batch",
+                            control: new Input()
+                        })
+                    ],
+                    search: function (oEvt) {
+                        const sVal = oEvt.getParameters().selectionSet[0].getValue();
+                        const aFilters = [];
+                        if (sVal) {
+                            aFilters.push(new Filter("Batch", FilterOperator.Contains, sVal));
+                        }
+
+                        if (sSelectedPlant) {
+                        aFilters.push(new sap.ui.model.Filter("Plant", sap.ui.model.FilterOperator.EQ, sSelectedPlant));
+                    }
+
+                    if (item_code) {
+                        aFilters.push(new sap.ui.model.Filter("Material", sap.ui.model.FilterOperator.EQ, item_code));
+                    }
+                        oTable.bindRows({
+                            path: "/I_Batch",
+                            parameters: { "$top": "500" },
+                            filters: aFilters
+                        });
+                    }
+                });
+                this._batchVH.setFilterBar(oFilterBar);
+            }
+
+            const oTable = await this._batchVH.getTableAsync();
+            oTable.bindRows({
+                path: "/I_Batch",
+                parameters: { "$top": "500" }
+            });
+
+            oBusy.close();
+            this._batchVH.open();
 
         },
 
