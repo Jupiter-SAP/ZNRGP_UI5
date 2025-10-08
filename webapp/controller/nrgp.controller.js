@@ -333,19 +333,81 @@ sap.ui.define([
         },
 
         /* ======================== STORAGE LOCATION VALUE HELP ======================== */
-        onValueHelpLoc: async function (oEvt) {
+        // onValueHelpLoc: async function (oEvt) {
+        //     this._oCurrentInput = oEvt.getSource();
+        //     const oView = this.getView();
+        //     const oBusy = new BusyDialog({ text: "Loading storage locations..." });
+        //     oBusy.open();
+
+        //     if (!this._oLocVH) {
+        //         const that = this;
+        //         this._oLocVH = new ValueHelpDialog("LocVH", {
+        //             supportMultiselect: false,
+        //             key: "StorageLocation",
+        //             descriptionKey: "StorageLocName",
+        //             stretch: Device.system.phone,
+        //             ok: function (oEvt) {
+        //                 const aTokens = oEvt.getParameter("tokens");
+        //                 if (aTokens && aTokens.length) {
+        //                     const oSel = aTokens[0].getCustomData()[0].getValue();
+        //                     oView.byId("Loaction").setValue(oSel.StorageLocation);
+        //                 }
+        //                 that._oLocVH.close();
+        //             },
+        //             cancel: function () { that._oLocVH.close(); }
+        //         });
+        //         oView.addDependent(this._oLocVH);
+
+        //         const oTable = await this._oLocVH.getTableAsync();
+        //         const oColModel = new JSONModel({ cols: [{ label: "Storage Location", template: "StorageLocation" },
+        //             { label: "Plant", template: "Plant" }
+        //         ] });
+        //         oTable.setModel(oColModel, "columns");
+        //         oTable.setModel(this.getView().getModel("nrgp"));
+
+        //         const oFilterBar = new FilterBar({
+        //             advancedMode: true,
+        //             filterBarExpanded: true,
+        //             filterGroupItems: [
+        //                 new FilterGroupItem({ groupName: "grp", name: "StorageLocation", label: "Storage Location", control: new Input() })
+        //             ],
+        //             search: function (oEvt) {
+        //                 const sVal = oEvt.getParameters().selectionSet[0].getValue();
+        //                 const aFilters = [];
+        //                 if (sVal) aFilters.push(new Filter("StorageLocation", FilterOperator.Contains, sVal));
+        //                 oTable.bindRows({ path: "/I_StorageLocation", parameters: { "$top": "500" }, filters: aFilters });
+        //             }
+        //         });
+        //         this._oLocVH.setFilterBar(oFilterBar);
+        //     }
+
+        //     const oTable = await this._oLocVH.getTableAsync();
+        //     oTable.bindRows({ path: "/I_StorageLocation", parameters: { "$top": "500" } });
+        //     oBusy.close();
+        //     this._oLocVH.open();
+        // },
+
+            onValueHelpLoc: async function (oEvt) {
             this._oCurrentInput = oEvt.getSource();
             const oView = this.getView();
-            const oBusy = new BusyDialog({ text: "Loading storage locations..." });
+            const oBusy = new sap.m.BusyDialog({ text: "Loading storage locations..." });
             oBusy.open();
+
+            // ✅ Get selected Plant value from header model
+            const sPlant = oView.byId("Plant").getValue();
+            if (!sPlant) {
+                oBusy.close();
+                sap.m.MessageToast.show("Please select a Plant first.");
+                return;
+            }
 
             if (!this._oLocVH) {
                 const that = this;
-                this._oLocVH = new ValueHelpDialog("LocVH", {
+                this._oLocVH = new sap.ui.comp.valuehelpdialog.ValueHelpDialog("LocVH", {
                     supportMultiselect: false,
                     key: "StorageLocation",
                     descriptionKey: "StorageLocName",
-                    stretch: Device.system.phone,
+                    stretch: sap.ui.Device.system.phone,
                     ok: function (oEvt) {
                         const aTokens = oEvt.getParameter("tokens");
                         if (aTokens && aTokens.length) {
@@ -354,35 +416,68 @@ sap.ui.define([
                         }
                         that._oLocVH.close();
                     },
-                    cancel: function () { that._oLocVH.close(); }
+                    cancel: function () {
+                        that._oLocVH.close();
+                    }
                 });
                 oView.addDependent(this._oLocVH);
 
+                // Create table for Value Help
                 const oTable = await this._oLocVH.getTableAsync();
-                const oColModel = new JSONModel({ cols: [{ label: "Storage Location", template: "StorageLocation" },
-                    { label: "Plant", template: "Plant" }
-                ] });
+                const oColModel = new sap.ui.model.json.JSONModel({
+                    cols: [
+                        { label: "Storage Location", template: "StorageLocation" },
+                        { label: "Plant", template: "Plant" }
+                    ]
+                });
                 oTable.setModel(oColModel, "columns");
                 oTable.setModel(this.getView().getModel("nrgp"));
 
-                const oFilterBar = new FilterBar({
+                // Add Filter Bar
+                const oFilterBar = new sap.ui.comp.filterbar.FilterBar({
                     advancedMode: true,
                     filterBarExpanded: true,
                     filterGroupItems: [
-                        new FilterGroupItem({ groupName: "grp", name: "StorageLocation", label: "Storage Location", control: new Input() })
+                        new sap.ui.comp.filterbar.FilterGroupItem({
+                            groupName: "grp",
+                            name: "StorageLocation",
+                            label: "Storage Location",
+                            control: new sap.m.Input()
+                        })
                     ],
                     search: function (oEvt) {
                         const sVal = oEvt.getParameters().selectionSet[0].getValue();
                         const aFilters = [];
-                        if (sVal) aFilters.push(new Filter("StorageLocation", FilterOperator.Contains, sVal));
-                        oTable.bindRows({ path: "/I_StorageLocation", parameters: { "$top": "500" }, filters: aFilters });
+
+                        // ✅ Always filter by Plant
+                        aFilters.push(new sap.ui.model.Filter("Plant", sap.ui.model.FilterOperator.EQ, sPlant));
+
+                        if (sVal) {
+                            aFilters.push(new sap.ui.model.Filter("StorageLocation", sap.ui.model.FilterOperator.Contains, sVal));
+                        }
+
+                        oTable.bindRows({
+                            path: "/I_StorageLocation",
+                            parameters: { "$top": "500" },
+                            filters: aFilters
+                        });
                     }
                 });
                 this._oLocVH.setFilterBar(oFilterBar);
             }
 
+            // ✅ Apply Plant filter before opening the Value Help
             const oTable = await this._oLocVH.getTableAsync();
-            oTable.bindRows({ path: "/I_StorageLocation", parameters: { "$top": "500" } });
+            const aFilters = [
+                new sap.ui.model.Filter("Plant", sap.ui.model.FilterOperator.EQ, sPlant)
+            ];
+
+            oTable.bindRows({
+                path: "/I_StorageLocation",
+                parameters: { "$top": "500" },
+                filters: aFilters
+            });
+
             oBusy.close();
             this._oLocVH.open();
         },
@@ -596,8 +691,8 @@ sap.ui.define([
             if (aItems.length > 0) nextLine = aItems[aItems.length - 1].LineNum + 10;
             aItems.push({
                 LineNum: nextLine, ItemCode: "", ItemName: "", Description: "",
-                Qty: 0, Unit: "", Rate: 0, ItemAmount: 0,
-                TaxCode: "", TaxPercent: 0, TaxAmount: 0, NetAmount: 0
+                Qty: "", Unit: "", Rate: "", ItemAmount: "",
+                TaxCode: "", TaxPercent: "", TaxAmount: "", NetAmount: ""
             });
             oModel.setProperty("/Items", aItems);
         },
@@ -780,7 +875,6 @@ sap.ui.define([
                     description2: headerData.Description2 || ""
                 },
                 items: items.map(i => ({
-
                     line_no: i.LineNum || "",
                     product: i.ItemCode || "",
                     productname: i.ItemName || "",
@@ -799,6 +893,7 @@ sap.ui.define([
                 }))
             };
 
+            
             headerData.Status = "Shipped";
 
             const oBusy = new BusyDialog({ text: "Shipping Goods" });
@@ -811,10 +906,10 @@ sap.ui.define([
                 data: JSON.stringify(oPayload),
                 success: function (data) {
                     oBusy.close();
-
+                   console.log(data)
                     if (data) {
                         let resp = JSON.parse(data);
-                        
+                        console.log(resp)
                         let nrgpPost = String(resp.POSTNUMBER).slice(-10);
                         oHeaderModel.setProperty("/PostNRGPNo", nrgpPost);
 

@@ -171,12 +171,12 @@
                 </t:Column>
 
                 <!-- Item Name -->
-                <t:Column id="colItemName" width="12rem">
+                <!-- <t:Column id="colItemName" width="12rem">
                     <m:Label id="_IDGenLabel17" text="Material Name" />
                     <t:template>
                         <m:Input id="_IDGenInput1" value="{DETAILS>ItemName}" liveChange=".onValueChange" editable="false"/>
                     </t:template>
-                </t:Column>
+                </t:Column> -->
 
                 <!-- Description -->
                 <t:Column id="colDescription" width="14rem">
