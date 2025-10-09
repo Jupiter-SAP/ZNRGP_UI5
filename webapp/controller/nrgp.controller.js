@@ -99,7 +99,8 @@ sap.ui.define([
             var document = oArgs.docNo;
             this.btnModel = new JSONModel({
             visibility : false,
-            editability : false
+            editability : false,
+            shipbtnshow : true
             });
             this.getView().setModel(this.btnModel,"visibilityModel");
         
@@ -115,6 +116,11 @@ sap.ui.define([
                     success: function (oData) {
 
                     const oViewModel = new JSONModel(oData);
+
+                if(oData.ReferenceDocument !== ''){
+                    this.getView().getModel("visibilityModel").setProperty("/shipbtnshow", false);
+                }
+
                     this.getView().setModel(oViewModel, "HEADER");
             }.bind(this),
                     error: function (oError) {
@@ -130,13 +136,7 @@ sap.ui.define([
                     ],
                     success: function (oData2) {
                     let oDataArray = oData2.results;
-                    console.log(oDataArray)
-                    oDataArray.forEach(item => {
-                        item.Qty = item.Qty - item.ShippedQuantity;
-                    });
-                    
-                  
-
+ 
                     console.log(oDataArray)
                     const DetailsModel = new JSONModel({ Items: oDataArray });
                     this.getView().setModel(DetailsModel, "DETAILS");
@@ -153,7 +153,7 @@ sap.ui.define([
             const oHeaderModel = new JSONModel({
                 Plant: "", DocumentNo: "", NRGPDate: "", FromStorageLoc: "", Status: "",
                 PartnerType: "", PartnerCode: "", PartnerName: "", Addr1: "",
-                Addr2: "", StateCode: "", Pin: "", Description1: "", Description2: ""
+                Addr2: "", StateCode: "", Pin: "", Description1: "", Description2: "" , ReferenceDocument : ""
             });
             this.getView().setModel(oHeaderModel, "HEADER");
             this.getView().getModel("visibilityModel").setProperty("/visibility", true);
@@ -712,7 +712,7 @@ sap.ui.define([
 
         /* ======================== CREATE NRGP ======================== */
         onClickCreate: function () {
-         
+           debugger
             const oView = this.getView();
             const oHeaderModel = oView.getModel("HEADER");
             const oDetailsModel = oView.getModel("DETAILS");
@@ -739,7 +739,7 @@ sap.ui.define([
                     partner_name: headerData.PartnerName || "",
                     from_storage_loc: headerData.FromStorageLoc || "",
                     addr1: headerData.Addr1 || "",
-                    addr2: headerData.Add2 || "",
+                    addr2: headerData.Addr2 || "",
                     state_code: headerData.StateCode || "",
                     pin: headerData.Pin || "",
                     status: headerData.Status || "In process",
@@ -779,7 +779,10 @@ sap.ui.define([
 
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
-                if (
+                if(!item.ItemCode && item.Description){
+
+                }
+                else if (
                     !item.Qty ||
                     !item.Rate ||
                     !item.Batch ||
@@ -823,6 +826,7 @@ sap.ui.define([
             });
         },
         onClickShip: function () {
+            var that = this;
            const oView = this.getView();
         //    const items = [];
         //    const oTable = this.byId("TableDetails");
@@ -921,9 +925,12 @@ sap.ui.define([
                         oHeaderModel.setProperty("/PostNRGPNo", nrgpPost);
 
                         oHeaderModel.setProperty("/Status", "Shipped");
-                        MessageToast.show("NRGP Shipped " + data);
+                        that.getView().getModel("visibilityModel").setProperty("/shipbtnshow", false);
+                        let migoNum = resp.DOCNUMBER;  
+                            let postNum = nrgpPost;  
+                            that.byId("_IDGenInput114").setValue(migoNum)
+                            sap.m.MessageBox.show(`Document No. ${postNum} shipped with ref doc ${migoNum}.`)
                     }
-
                 },
                 error: function (xhr, status, error) {
                     oBusy.close();
@@ -934,99 +941,115 @@ sap.ui.define([
 
         },
 
-     onvaluehelpbatch: async function (oEvt){
+     onvaluehelpbatch: async function (oEvt) {
+    this._oCurrentInput = oEvt.getSource(); 
+    const oView = this.getView();
+    const oBusy = new sap.m.BusyDialog({ text: "Loading batches..." });
+    const oCtx = this._oCurrentInput.getBindingContext("DETAILS");
+    const sPath = oCtx.getPath();
+    const item_code = oView.getModel("DETAILS").getProperty(sPath + "/ItemCode");
+    const sSelectedPlant = oView.getModel("HEADER").getProperty("/Plant");
+    oBusy.open();
 
-            this._oCurrentInput = oEvt.getSource(); 
-            const oView = this.getView();
-            const oBusy = new BusyDialog({ text: "Loading items..." });
-            const path = this._oCurrentInput.getBindingContext("DETAILS").getPath()
-            const item_code = this.getView().getModel("DETAILS").getProperty(path).ItemCode
-            oBusy.open();
+    if (!sSelectedPlant) {
+        oBusy.close();
+        sap.m.MessageToast.show("Please select a Plant first.");
+        return;
+    }
 
-            if (!this._batchVH) {
-                const that = this;
-                const sSelectedPlant = oView.getModel("HEADER").getProperty("/Plant");
-                this._batchVH = new ValueHelpDialog("Ibatch", {
-                    supportMultiselect: false,
-                    key: "Batch",
-                    descriptionKey: "Batch",
-                    stretch: Device.system.phone,
-                    ok: function (oEvt) {
-                        const aTokens = oEvt.getParameter("tokens");
-                        if (aTokens && aTokens.length) {
-                            const oSel = aTokens[0].getCustomData()[0].getValue();
-                            const oCtx = that._oCurrentInput.getBindingContext("DETAILS");
-                            debugger
-                            if (oCtx) {
-                                const sPath = oCtx.getPath();
-                                // console.log(oSel,sPath)
-                                const oDetailsModel = that.getView().getModel("DETAILS");
-                                oDetailsModel.setProperty(sPath + "/Batch", oSel.Batch);
-                                const oRow = oDetailsModel.getProperty(sPath);
-                                oDetailsModel.setProperty(sPath,oRow);
-                            }
-                        }
-                        that._batchVH.close();
-                    },
-                    cancel: function () { that._batchVH.close(); }
-                });
-                oView.addDependent(this._batchVH);
-
-                const oTable = await this._batchVH.getTableAsync();
-                const oColModel = new JSONModel({
-                    cols: [
-                        { label: "Batch", template: "Batch" },
-                        { label: "Material", template: "Material" }
-                    ]
-                });
-                oTable.setModel(oColModel, "columns");
-                oTable.setModel(this.getView().getModel("nrgp"));
-
-                const oFilterBar = new FilterBar({
-                    advancedMode: true,
-                    filterBarExpanded: true,
-                    filterGroupItems: [
-                        new FilterGroupItem({
-                            groupName: "grp",
-                            name: "Batch",
-                            label: "Batch",
-                            control: new Input()
-                        })
-                    ],
-                    search: function (oEvt) {
-                        const sVal = oEvt.getParameters().selectionSet[0].getValue();
-                        const aFilters = [];
-                        if (sVal) {
-                            aFilters.push(new Filter("Batch", FilterOperator.Contains, sVal));
-                        }
-
-                        if (sSelectedPlant) {
-                        aFilters.push(new sap.ui.model.Filter("Plant", sap.ui.model.FilterOperator.EQ, sSelectedPlant));
+    if (!this._batchVH) {
+        const that = this;
+        this._batchVH = new sap.ui.comp.valuehelpdialog.ValueHelpDialog("BatchVH", {
+            supportMultiselect: false,
+            key: "Batch",
+            descriptionKey: "Batch",
+            stretch: sap.ui.Device.system.phone,
+            ok: function (oEvt) {
+                const aTokens = oEvt.getParameter("tokens");
+                if (aTokens && aTokens.length) {
+                    const oSel = aTokens[0].getCustomData()[0].getValue();
+                    const oCtx = that._oCurrentInput.getBindingContext("DETAILS");
+                    if (oCtx) {
+                        const sPath = oCtx.getPath();
+                        const oDetailsModel = that.getView().getModel("DETAILS");
+                        oDetailsModel.setProperty(sPath + "/Batch", oSel.Batch);
                     }
+                }
+                that._batchVH.close();
+            },
+            cancel: function () { that._batchVH.close(); }
+        });
+        oView.addDependent(this._batchVH);
 
-                    if (item_code) {
-                        aFilters.push(new sap.ui.model.Filter("Material", sap.ui.model.FilterOperator.EQ, item_code));
-                    }
-                        oTable.bindRows({
-                            path: "/I_Batch",
-                            parameters: { "$top": "500" },
-                            filters: aFilters
-                        });
-                    }
+        // Create Table
+        const oTable = await this._batchVH.getTableAsync();
+        const oColModel = new sap.ui.model.json.JSONModel({
+            cols: [
+                { label: "Batch", template: "Batch" },
+                { label: "Material", template: "Material" },
+                { label: "Plant", template: "Plant" }
+            ]
+        });
+        oTable.setModel(oColModel, "columns");
+        oTable.setModel(oView.getModel("nrgp"));
+
+        // Add Filter Bar
+        const oFilterBar = new sap.ui.comp.filterbar.FilterBar({
+            advancedMode: true,
+            filterBarExpanded: true,
+            filterGroupItems: [
+                new sap.ui.comp.filterbar.FilterGroupItem({
+                    groupName: "grp",
+                    name: "Batch",
+                    label: "Batch",
+                    control: new sap.m.Input()
+                })
+            ],
+            search: function (oEvt) {
+                const sVal = oEvt.getParameters().selectionSet[0].getValue();
+                const aFilters = [];
+
+                // ✅ Always filter by Plant & Material
+                if (sSelectedPlant) {
+                    aFilters.push(new sap.ui.model.Filter("Plant", sap.ui.model.FilterOperator.EQ, sSelectedPlant));
+                }
+
+                if (item_code) {
+                    aFilters.push(new sap.ui.model.Filter("Material", sap.ui.model.FilterOperator.EQ, item_code));
+                }
+
+                if (sVal) {
+                    aFilters.push(new sap.ui.model.Filter("Batch", sap.ui.model.FilterOperator.Contains, sVal));
+                }
+
+                oTable.bindRows({
+                    path: "/I_Batch",
+                    parameters: { "$top": "500" },
+                    filters: aFilters
                 });
-                this._batchVH.setFilterBar(oFilterBar);
             }
+        });
 
-            const oTable = await this._batchVH.getTableAsync();
-            oTable.bindRows({
-                path: "/I_Batch",
-                parameters: { "$top": "500" }
-            });
+        this._batchVH.setFilterBar(oFilterBar);
+    }
 
-            oBusy.close();
-            this._batchVH.open();
+    // ✅ Preload with filters before open (like Location Value Help)
+    const oTable = await this._batchVH.getTableAsync();
+    const aFilters = [
+        new sap.ui.model.Filter("Plant", sap.ui.model.FilterOperator.EQ, sSelectedPlant),
+        new sap.ui.model.Filter("Material", sap.ui.model.FilterOperator.EQ, item_code)
+    ];
 
-        },
+    oTable.bindRows({
+        path: "/I_Batch",
+        parameters: { "$top": "500" },
+        filters: aFilters
+    });
+
+    oBusy.close();
+    this._batchVH.open();
+}
+,
 
         formatDateToIST: function (dateValue) {
             if (!dateValue) return "";

@@ -114,6 +114,11 @@
                             <m:Label id="_IDGenLabel15" text="Pin:" required="false" width="180px" />
                             <m:Input id="Pin" width="200px" value="{HEADER>/Pin}" editable="{= ${HEADER>/PartnerType} === 'Other' }" />
                         </m:HBox>
+
+                        <m:HBox id="_IDGenHBox165" alignItems="Center">
+                            <m:Label id="_IDGenLabel224" text="Ref Document No. :" required="false" width="180px"  />
+                            <m:Input id="_IDGenInput114" value="{HEADER>/ReferenceDocument}" width="200px" editable="false" />
+                        </m:HBox>
                     </m:VBox>
 
                     <!-- Right Section -->
@@ -190,7 +195,7 @@
                 <t:Column id="colQty" width="8rem">
                     <m:Label id="_IDGenLabel19" text="Quantity" required="true"/>
                     <t:template>
-                        <m:Input id="_IDGenInput3" value="{DETAILS>Qty}" type="Number" liveChange=".onValueChange"/>
+                        <m:Input id="_IDGenInput3" value="{DETAILS>Qty}" type="Number" liveChange=".onValueChange" editable="{visibilityModel>/editability}"/>
                     </t:template>
                 </t:Column>
 
@@ -291,7 +296,7 @@
     <m:Toolbar id="_IDGenToolbar1">
         <m:ToolbarSpacer id="_IDGenToolbarSpacer1" />
         <m:Button id="btnCreate" type="Emphasized" text="Create" press="onClickCreate" visible="{visibilityModel>/visibility}" />
-        <m:Button id="btnShip" type="Emphasized" text="Ship" press="onClickShip" />
+        <m:Button id="btnShip" type="Emphasized" text="Ship" press="onClickShip" enabled="{visibilityModel>/shipbtnshow}"/>
         <!-- <m:Button id="btnClear" type="Emphasized" text="Clear" press="onClickClear" /> -->
 
     </m:Toolbar>
