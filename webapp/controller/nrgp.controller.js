@@ -136,8 +136,7 @@ sap.ui.define([
                     ],
                     success: function (oData2) {
                     let oDataArray = oData2.results;
- 
-                    console.log(oDataArray)
+
                     const DetailsModel = new JSONModel({ Items: oDataArray });
                     this.getView().setModel(DetailsModel, "DETAILS");
 
@@ -151,7 +150,7 @@ sap.ui.define([
          if(document.length === 1) {
    
             const oHeaderModel = new JSONModel({
-                Plant: "", DocumentNo: "", NRGPDate: "", FromStorageLoc: "", Status: "",
+                Plant: "", DocumentNo: "", NrgpNo: "", NrgpDate: "", DocumentDate: "", FromStorageLoc: "", Status: "",
                 PartnerType: "", PartnerCode: "", PartnerName: "", Addr1: "",
                 Addr2: "", StateCode: "", Pin: "", Description1: "", Description2: "" , ReferenceDocument : ""
             });
@@ -712,7 +711,7 @@ sap.ui.define([
 
         /* ======================== CREATE NRGP ======================== */
         onClickCreate: function () {
-           debugger
+            var that = this;
             const oView = this.getView();
             const oHeaderModel = oView.getModel("HEADER");
             const oDetailsModel = oView.getModel("DETAILS");
@@ -798,8 +797,6 @@ sap.ui.define([
             const oBusy = new BusyDialog({ text: "Creating NRGP..." });
             oBusy.open();
 
-            const that = this; 
-
             $.ajax({
                 url: `/sap/bc/http/sap/ZHTTP_GATENRGP?shipped=false`,
                 method: "POST",
@@ -810,6 +807,8 @@ sap.ui.define([
 
                     if (response) {
                         oHeaderModel.setProperty("/Status", "In process");
+                        oHeaderModel.setProperty("/DocumentNo", response);
+                        oHeaderModel.setProperty("/DocumentDate", that.formatDateToIST(newDate));
 
                         MessageToast.show("Document Created for " + response);
                     } else {
@@ -875,7 +874,7 @@ sap.ui.define([
                     plant: headerData.Plant || "",
                     partner_type: oView.byId("Partner").getSelectedKey() || "",
                     partner_code: headerData.PartnerCode || "",
-                    document_date: this.formatDateToIST(newDate),
+                    nrgp_date: this.formatDateToIST(newDate),
                     partner_name: headerData.PartnerName || "",
                     from_storage_loc: headerData.FromStorageLoc || "",
                     addr1: headerData.Addr1 || "",
@@ -922,9 +921,10 @@ sap.ui.define([
                         let resp = JSON.parse(data);
                         
                         let nrgpPost = String(resp.POSTNUMBER).slice(-10);
-                        oHeaderModel.setProperty("/PostNRGPNo", nrgpPost);
 
                         oHeaderModel.setProperty("/Status", "Shipped");
+                        oHeaderModel.setProperty("/NrgpNo", nrgpPost);
+                        oHeaderModel.setProperty("/NrgpDate", that.formatDateToIST(newDate));
                         that.getView().getModel("visibilityModel").setProperty("/shipbtnshow", false);
                         let migoNum = resp.DOCNUMBER;  
                             let postNum = nrgpPost;  

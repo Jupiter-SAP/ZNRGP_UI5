@@ -36,18 +36,23 @@
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox2" alignItems="Center" >
-                            <m:Label id="_IDGenLabel2" text="NRGP No.:" required="true" width="180px" />
-                            <m:Input id="NRGPNo" value="{HEADER>/DocumentNo}" width="200px" editable = "false"/>
+                            <m:Label id="_IDGenLabel2" text="Document No.:" required="true" width="180px" />
+                            <m:Input id="DocumentNo" value="{HEADER>/DocumentNo}" width="200px" editable = "false"/>
+                        </m:HBox>
+
+                        <m:HBox id="_IDGenHBox25" alignItems="Center" >
+                            <m:Label id="_IDGenLabel251" text="Document Date:" required="true" width="180px" />
+                            <m:DatePicker id="DocumentDate" value="{HEADER>/DocumentDate}" width="200px" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" editable = "false"/>
                         </m:HBox>
 
                        <m:HBox id="_IDGenHBox31" alignItems="Center">
-                            <m:Label id="_IDGenLabel31" text="Post NRGP No.:" required="false" width="180px" />
-                            <m:Input id="PostNRGPNo" value="{HEADER>/PostNRGPNo}" width="200px" editable = "false" />
+                            <m:Label id="_IDGenLabel31" text="NRGP No.:" required="false" width="180px" />
+                            <m:Input id="NRGPNo" value="{HEADER>/NrgpNo}" width="200px" editable = "false" />
                         </m:HBox>
                         
                         <m:HBox id="_IDGenHBox4" alignItems="Center">
                             <m:Label id="_IDGenLabel4" text="NRGP Date:" required="false" width="180px" />
-                            <m:DatePicker id="NRGPDate" value="{HEADER>/NRGPDate}" width="200px" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" editable = "false"/>
+                            <m:DatePicker id="NRGPDate" value="{HEADER>/NrgpDate}" width="200px" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" editable = "false"/>
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox5" alignItems="Center">
@@ -146,7 +151,7 @@
         <!-- Table Section -->
         <fo:DynamicPage id="dynamicPageBillingEntry" fitContent="true" title="Items">
         <fo:content>
-            <t:Table id="TableDetails" rows="{DETAILS>/Items}" rowMode="Auto" visibleRowCount="5" 
+            <t:Table id="TableDetails" rows="{DETAILS>/Items}" rowMode="Auto"  
                 selectionMode="MultiToggle">
 
             <t:extension>
@@ -295,7 +300,7 @@
    <m:footer>
     <m:Toolbar id="_IDGenToolbar1">
         <m:ToolbarSpacer id="_IDGenToolbarSpacer1" />
-        <m:Button id="btnCreate" type="Emphasized" text="Create" press="onClickCreate" visible="{visibilityModel>/visibility}" />
+        <m:Button id="btnCreate" type="Emphasized" text="Create" press="onClickCreate" visible="{visibilityModel>/visibility}" enabled="{visibilityModel>/shipbtnshow}"  />
         <m:Button id="btnShip" type="Emphasized" text="Ship" press="onClickShip" enabled="{visibilityModel>/shipbtnshow}"/>
         <!-- <m:Button id="btnClear" type="Emphasized" text="Clear" press="onClickClear" /> -->
 
