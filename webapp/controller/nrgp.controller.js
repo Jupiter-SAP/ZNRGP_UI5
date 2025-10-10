@@ -95,6 +95,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: function (oEvent) {
+            var that = this;
             var oArgs = oEvent.getParameter("arguments");
             var document = oArgs.docNo;
             this.btnModel = new JSONModel({
@@ -114,13 +115,15 @@ sap.ui.define([
                 var oModel = new ODataModel("/sap/opu/odata/sap/ZSB_GATE/");
                 oModel.read(sPath, {
                     success: function (oData) {
-
+                    let documentDate = that.formatDateToIST(oData.DocumentDate);
+                    oData.DocumentDate = documentDate;
                     const oViewModel = new JSONModel(oData);
+                    console.log(oData);
 
                 if(oData.ReferenceDocument !== ''){
                     this.getView().getModel("visibilityModel").setProperty("/shipbtnshow", false);
                 }
-
+                 
                     this.getView().setModel(oViewModel, "HEADER");
             }.bind(this),
                     error: function (oError) {
