@@ -116,9 +116,10 @@ sap.ui.define([
                 oModel.read(sPath, {
                     success: function (oData) {
                     let documentDate = that.formatDateToIST(oData.DocumentDate);
+                    let nrgpDate = that.formatDateToIST(oData.NrgpDate);
                     oData.DocumentDate = documentDate;
+                    oData.NrgpDate = nrgpDate;
                     const oViewModel = new JSONModel(oData);
-                    console.log(oData);
 
                 if(oData.ReferenceDocument !== ''){
                     this.getView().getModel("visibilityModel").setProperty("/shipbtnshow", false);
@@ -151,9 +152,9 @@ sap.ui.define([
 
          }       
          if(document.length === 1) {
-   
+            const initialDate = new Date();
             const oHeaderModel = new JSONModel({
-                Plant: "", DocumentNo: "", NrgpNo: "", NrgpDate: "", DocumentDate: "", FromStorageLoc: "", Status: "",
+                Plant: "", DocumentNo: "", NrgpNo: "", NrgpDate: "", DocumentDate: that.formatDateToIST(initialDate), FromStorageLoc: "", Status: "",
                 PartnerType: "", PartnerCode: "", PartnerName: "", Addr1: "",
                 Addr2: "", StateCode: "", Pin: "", Description1: "", Description2: "" , ReferenceDocument : ""
             });
@@ -492,6 +493,89 @@ sap.ui.define([
             oBusy.close();
             this._oLocVH.open();
         },
+
+        onValueHelpCostCenter: async function (oEvt) {
+            this._oCurrentInput = oEvt.getSource();
+            const oView = this.getView();
+            const oBusy = new sap.m.BusyDialog({ text: "Loading Cost Centers..." });
+            oBusy.open();
+
+            if (!this._oCostVH) {
+                const that = this;
+                this._oCostVH = new sap.ui.comp.valuehelpdialog.ValueHelpDialog("CostVH", {
+                    supportMultiselect: false,
+                    key: "CostCenter",
+                    descriptionKey: "CostCenterName",
+                    stretch: sap.ui.Device.system.phone,
+                    ok: function (oEvt) {
+                        const aTokens = oEvt.getParameter("tokens");
+                        if (aTokens && aTokens.length) {
+                             const oCtx = that._oCurrentInput.getBindingContext("DETAILS");
+                            if (oCtx) {
+                                const sPath = oCtx.getPath();
+                                const oDetailsModel = that.getView().getModel("DETAILS");
+                                const oSel = aTokens[0].getCustomData()[0].getValue();
+                                oDetailsModel.setProperty(sPath + "/CostCenter", oSel.CostCenter);
+                            }
+                        }
+                        that._oCostVH.close();
+                    },
+                    cancel: function () {
+                        that._oCostVH.close();
+                    }
+                });
+                oView.addDependent(this._oCostVH);
+
+                // Create Table for Value Help
+                const oTable = await this._oCostVH.getTableAsync();
+                const oColModel = new sap.ui.model.json.JSONModel({
+                    cols: [
+                        { label: "Cost Center", template: "CostCenter" }
+                    ]
+                });
+                oTable.setModel(oColModel, "columns");
+                oTable.setModel(this.getView().getModel("nrgp")); // Assuming your main OData model name is 'nrgp'
+
+                // Add Filter Bar
+                const oFilterBar = new sap.ui.comp.filterbar.FilterBar({
+                    advancedMode: true,
+                    filterBarExpanded: true,
+                    filterGroupItems: [
+                        new sap.ui.comp.filterbar.FilterGroupItem({
+                            groupName: "grp",
+                            name: "CostCenter",
+                            label: "Cost Center",
+                            control: new sap.m.Input()
+                        })
+                    ],
+                    search: function (oEvt) {
+                        const sVal = oEvt.getParameters().selectionSet[0].getValue();
+                        const aFilters = [];
+                        if (sVal) {
+                            aFilters.push(new sap.ui.model.Filter("CostCenter", sap.ui.model.FilterOperator.Contains, sVal));
+                        }
+
+                        oTable.bindRows({
+                            path: "/I_CostCenter",
+                            parameters: { "$top": "500" },
+                            filters: aFilters
+                        });
+                    }
+                });
+                this._oCostVH.setFilterBar(oFilterBar);
+            }
+
+            // Bind Table Data (Initial Load)
+            const oTable = await this._oCostVH.getTableAsync();
+            oTable.bindRows({
+                path: "/I_CostCenter",
+                parameters: { "$top": "500" }
+            });
+
+            oBusy.close();
+            this._oCostVH.open();
+        },
+
 
         /* ======================== ITEM VALUE HELP ======================== */
         onValueHelpitem: async function (oEvt) {

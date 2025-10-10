@@ -116,7 +116,7 @@
                         </m:HBox>
 
                         <m:HBox id="_IDGenHBox14" alignItems="Center">
-                            <m:Label id="_IDGenLabel15" text="Pin:" required="false" width="180px" />
+                            <m:Label id="_IDGenLabel15" text="Pin Code:" required="false" width="180px" />
                             <m:Input id="Pin" width="200px" value="{HEADER>/Pin}" editable="{= ${HEADER>/PartnerType} === 'Other' }" />
                         </m:HBox>
 
@@ -232,7 +232,7 @@
                 <t:Column id="colCostCenter" width="12rem">
                     <m:Label id="_IDGenLabel261" text="Cost Center" required="true"/>
                     <t:template>
-                        <m:Input id="_IDGenInput101"  value="{DETAILS>CostCenter}" editable="{visibilityModel>/editability}" />
+                        <m:Input id="_IDGenInput101"  value="{DETAILS>CostCenter}" editable="{visibilityModel>/editability}" showValueHelp="true" valueHelpRequest=".onValueHelpCostCenter" />
                     </t:template>
                 </t:Column>
 
